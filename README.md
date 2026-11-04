@@ -37,16 +37,16 @@ The system aims to make agricultural waste exchange easier and encourage the reu
 
 Note: Features will be developed and improved throughout the project.
 
-6. Version Control and Collaboration
+5. Version Control and Collaboration
 
 GitHub is used for version control and team collaboration.
 
 Each team member works on their assigned tasks using separate branches. Code changes are regularly committed, pushed, reviewed, and merged into the main branch.
 
-7. Project Status
+6. Project Status
 
 Under Development
 
-8. Expected Outcome
+7. Expected Outcome
 
 To develop a functional web-based platform that facilitates agricultural waste exchange and supports organic fertilizer production while promoting environmental sustainability.
