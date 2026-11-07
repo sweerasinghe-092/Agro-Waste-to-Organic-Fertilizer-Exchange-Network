@@ -1,0 +1,125 @@
+/* ===== Login / Register ===== */
+
+/* Full screen background */
+.login-bg {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: linear-gradient(rgba(10, 35, 22, .38), rgba(10, 35, 22, .48)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1800&q=85') center / cover;
+}
+
+/* White card in center */
+.login-card {
+    background: #fff;
+    width: 100%;
+    max-width: 440px;
+    padding: 38px 36px;
+    border-radius: 22px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, .35);
+    text-align: center;
+}
+
+.login-card .logo { font-size: 32px; }
+
+.login-card h1 {
+    font-size: 26px;
+    margin: 8px 0 4px;
+    color: #174b35;
+}
+
+.login-card p.sub {
+    color: #6b7d70;
+    font-size: 14px;
+    margin: 0 0 22px;
+}
+
+/* Labels and inputs */
+.login-card label {
+    display: block;
+    text-align: left;
+    font-weight: 700;
+    font-size: 14px;
+    color: #385441;
+    margin: 14px 0 6px;
+}
+
+.login-card input,
+.login-card select {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #d4e0d4;
+    border-radius: 12px;
+    font: inherit;
+    background: #fbfdfb;
+}
+
+.login-card input:focus {
+    outline: 2px solid #dcebd7;
+    border-color: #26734d;
+}
+
+/* Main button */
+.login-card button {
+    width: 100%;
+    margin-top: 22px;
+    background: #14151f;
+    color: #fff;
+    border: 0;
+    padding: 14px;
+    border-radius: 12px;
+    font: 700 15px 'DM Sans', sans-serif;
+    cursor: pointer;
+}
+
+.login-card button:hover { background: #26734d; }
+
+/* Success and error messages */
+.login-card .message {
+    background: #e5f5e6;
+    border: 1px solid #c6e8ca;
+    padding: 12px;
+    border-radius: 10px;
+    color: #235b36;
+    font-size: 14px;
+}
+
+.login-card .error {
+    background: #fff0ee;
+    border: 1px solid #ffd4ce;
+    padding: 12px;
+    border-radius: 10px;
+    color: #a33;
+    font-size: 14px;
+}
+
+/* Links below form */
+.login-card .switch {
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.login-card .switch a {
+    color: #26734d;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.login-card .demo {
+    font-size: 12px;
+    color: #999;
+    margin-top: 12px;
+}
+
+/* Two inputs in one row */
+.login-card .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Mobile */
+@media (max-width: 560px) {
+    .login-card .row { grid-template-columns: 1fr; }
+}
