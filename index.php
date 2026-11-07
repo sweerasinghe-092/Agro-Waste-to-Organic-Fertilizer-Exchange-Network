@@ -1,4 +1,136 @@
 
+<style>
+/* Home Page CSS */
+
+.hero {
+    padding: 80px 8%;
+    text-align: center;
+    background:#173f2b;
+    color: white;
+    border-radius: 12px;
+}
+
+.hero .eyebrow {
+    color:#c5e7a7;
+    font-weight: bold;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin: 20px 0;
+}
+
+.hero h1 span {
+    color:#c5e7a7;
+}
+
+.hero p {
+    max-width: 700px;
+    margin: 0 auto 25px;
+    line-height: 1.7;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 22px;
+    background:#4d9b55;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.btn-secondary {
+    background: white;
+    color:#173f2b;
+}
+
+.home-section {
+    padding: 45px 6%;
+}
+
+.section-title {
+    text-align: center;
+    color:#173f2b;
+    margin-bottom: 30px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.stat-card {
+    text-align: center;
+}
+
+.stat-card h2 {
+    font-size: 32px;
+    color:#287442;
+}
+
+.pill {
+    display: inline-block;
+    padding: 6px 12px;
+    background:#e3f2e5;
+    color:#287442;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.step-number {
+    color:#287442;
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.price {
+    color:#287442;
+    font-weight: bold;
+}
+
+.small {
+    font-size: 14px;
+    color:#666;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    .home-section {
+        padding: 30px 5%;
+    }
+}
+</style>
+
 <!-- Hero Section -->
 <section class="hero">
     <span class="eyebrow">A greener tomorrow starts here</span>
