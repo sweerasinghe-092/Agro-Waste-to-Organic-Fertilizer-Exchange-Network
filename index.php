@@ -266,7 +266,72 @@ include 'includes/header.php';
     <h2 class="section-title">Fresh from the fertilizer market</h2>
 
     <div class="grid">
-        <!-- Product cards will be added in Part 4 -->
+        <?php
+// Get latest 4 active fertilizer products
+$products = $conn->query(
+    "SELECT p.*, u.full_name
+     FROM fertilizer_products p
+     JOIN users u ON p.producer_id = u.user_id
+     WHERE p.status = 'active'
+     ORDER BY p.created_at DESC
+     LIMIT 4"
+);
+?>
+
+<?php if ($products && $products->num_rows > 0): ?>
+
+    <?php while ($p = $products->fetch_assoc()): ?>
+
+        <div class="card">
+
+            <img
+                class="feature-image"
+                src="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=700&q=80"
+                alt="Organic soil fertilizer"
+            >
+
+            <span class="pill">
+                <?= e($p['fertilizer_type']) ?>
+            </span>
+
+            <h3>
+                <?= e($p['product_name']) ?>
+            </h3>
+
+            <p class="price">
+                Rs. <?= number_format((float)$p['price'], 2) ?>
+                / <?= e($p['unit']) ?>
+            </p>
+
+            <p class="small">
+                Produced by <?= e($p['full_name']) ?>
+            </p>
+
+            <a class="btn" href="fertilizer_market.php">
+                View product market
+            </a>
+
+        </div>
+
+    <?php endwhile; ?>
+
+<?php else: ?>
+
+    <div class="card">
+        <h3>Products coming soon</h3>
+
+        <p>
+            Our marketplace is growing.
+            Check back soon for locally made organic fertilizer.
+        </p>
+
+        <a class="btn" href="fertilizer_market.php">
+            Explore market
+        </a>
+    </div>
+
+<?php endif; ?>
+
     </div>
 </section>
 
