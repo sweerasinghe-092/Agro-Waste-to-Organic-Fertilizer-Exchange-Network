@@ -35,3 +35,5 @@ $products = $st->get_result();
 $pageTitle = "Fertilizer Market";
 include 'includes/header.php';
 ?>
+
+//updated
