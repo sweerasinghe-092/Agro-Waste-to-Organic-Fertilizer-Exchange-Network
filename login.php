@@ -1,3 +1,33 @@
+<?php
+require_once 'config/db.php';
+require_once 'includes/functions.php';
+
+$err = "";
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+
+    $st = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $st->bind_param("s", $email);
+    $st->execute();
+    $u = $st->get_result()->fetch_assoc();
+
+    if ($u && password_verify($password, $u['password_hash'])) {
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = (int)$u['user_id'];
+        $_SESSION['full_name'] = $u['full_name'];
+        $_SESSION['role'] = $u['role'];
+
+        header('Location: ' . ($u['role'] === 'admin' ? 'admin.php' : 'dashboard.php'));
+        exit;
+    } else {
+        $err = "Invalid email or password.";
+    }
+}
+
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +43,8 @@
     <div class="login-card">
         <h1 class="auth-brand"><img src="assets/agro-exchange-logo.svg" alt="">Agro Exchange</h1>
         <p class="sub">Welcome back</p>
+
+        <?php if ($err): ?><p class="error"><?= e($err) ?></p><?php endif; ?>
 
         <form method="post">
             <label>Email</label>
