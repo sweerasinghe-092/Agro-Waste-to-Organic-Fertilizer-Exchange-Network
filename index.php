@@ -1,320 +1,63 @@
 <?php
-// Database connection
+// Home page
 require_once 'config/db.php';
 require_once 'includes/functions.php';
 
 // Count active users
-$users = 0;
-
-$userResult = $conn->query(
-    "SELECT COUNT(*) AS n
-     FROM users
-     WHERE status = 'active'"
-);
- 
-if ($userResult) {
-    $users = (int)$userResult->fetch_assoc()['n'];
-}
+$users = (int)$conn->query("SELECT COUNT(*) n FROM users WHERE status = 'active'")->fetch_assoc()['n'];
 
 // Count available waste listings
-$listings = 0;
+$listings = (int)$conn->query("SELECT COUNT(*) n FROM waste_listings WHERE status = 'available'")->fetch_assoc()['n'];
 
-$listingResult = $conn->query(
-    "SELECT COUNT(*) AS n
-     FROM waste_listings
-     WHERE status = 'available'"
-);
+// Total quantity exchanged
+$exchanged = (float)$conn->query("SELECT COALESCE(SUM(quantity_requested), 0) n FROM exchange_requests WHERE status = 'completed'")->fetch_assoc()['n'];
 
-if ($listingResult) {
-    $listings = (int)$listingResult->fetch_assoc()['n'];
-}
+// Get latest 4 active products
+$products = $conn->query("SELECT p.*, u.full_name FROM fertilizer_products p JOIN users u ON p.producer_id = u.user_id WHERE p.status = 'active' ORDER BY p.created_at DESC LIMIT 4");
 
-// Calculate exchanged quantity
-$exchanged = 0;
-
-$exchangeResult = $conn->query(
-    "SELECT COALESCE(SUM(quantity_requested), 0) AS n
-     FROM exchange_requests
-     WHERE status = 'completed'"
-);
-
-
-if ($exchangeResult) {
-    $exchanged = (float)$exchangeResult->fetch_assoc()['n'];
-}
-$products = $conn->query(
-    "SELECT p.*, u.full_name
-     FROM fertilizer_products p
-     JOIN users u ON p.producer_id = u.user_id
-     WHERE p.status = 'active'
-     ORDER BY p.created_at DESC
-     LIMIT 4"
-);
-
-
-// Page title
 $pageTitle = "Home";
-
 include 'includes/header.php';
 ?>
-<style>
-/* Home Page CSS */
 
-
-
-.hero {
-   
-    margin: 28px 0% 0;
-    padding: 90px 3% 80px;
-    border-radius: 22px;
-}
-
-.home-section {
-    padding: 32px 3%;
-    margin: 22px 0% 0;
-    border-radius: 22px;
-}
-.hero h1 { font-size: 62px; line-height: 1.05; max-width: 750px; }
-.hero p { max-width: 680px; margin: 0 0 28px }
-.actions { justify-content: flex-start; }
-
-.btn { background: #1e5a36 ; border-radius: 999px; }
-.btn-secondary { background: white ; color: #173f2b  }
-
-.hero .eyebrow {
-    color: #c5e7a7;
-    font-weight: bold;
-    text-align: left;
-}
-
-.hero h1 {
-    font-size: 42px;
-    margin: 20px 0;
-}
-
-.hero h1 span {
-    color:#c5e7a7;
-}
-
-.hero p {
-    max-width: 700px;
-    margin: 0 auto 25px;
-    line-height: 1.7;
-}
-
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.btn {
-    display: inline-block;
-    padding: 12px 22px;
-    background: #4d9b55;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-}
-
-.btn-secondary {
-    background: white;
-    color:#173f2b;
-}
-
-.home-section {
-    padding: 45px 6%;
-}
-
-.section-title {
-    text-align: center;
-    color: #173f2b;
-    margin-bottom: 30px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
-}
-
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-}
-
-.card img {
-    width: 100%;
-    height: 190px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-.stat-card {
-    text-align: center;
-}
-
-.stat-card h2 {
-    font-size: 32px;
-    color:#287442;
-}
-
-.pill {
-    display: inline-block;
-    padding: 6px 12px;
-    background:#e3f2e5;
-    color:#287442;
-    border-radius: 20px;
-    font-size: 13px;
-}
-
-.step-number {
-    color:#287442;
-    font-size: 25px;
-    font-weight: bold;
-    margin-top: 15px;
-}
-
-.price {
-    color:#287442;
-    font-weight: bold;
-}
-
-.small {
-    font-size: 14px;
-    color:#666;
-}
-
-@media (max-width: 768px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hero h1 {
-        font-size: 30px;
-    }
-
-    .home-section {
-        padding: 30px 5%;
-    }
-}
-.section-title {
-    text-align: left;
-}
-.market-section .section-title {
-    text-align: left;
-}
-
-.market-section .grid .card:only-child {
-    grid-column: 1 / -1;
-    width: 100%;
-}
-
-.btn {
-    background: #173f2b;
-}
-/* ==== PHOTO 1 wage - PARAGRAPH + BUTTONS LEFT FIX ==== */
-.hero {
-    display: block !important;
-    align-items: flex-start !important;
-    text-align: left !important;
-}
-.hero .eyebrow, .hero h1 {
-    text-align: left !important;
-    margin-left: 0 !important;
-}
-.hero p {
-    text-align: left !important;
-    margin: 0 0 28px !important;
-    margin-left: 0 !important;
-    margin-right: auto !important;
-}
-.hero .actions {
-    display: flex !important;
-    justify-content: flex-start !important;
-    margin-left: 0 !important;
-}
-</style>
-
-<!-- Hero Section -->
+<!-- Hero section -->
 <section class="hero">
     <span class="eyebrow">A greener tomorrow starts here</span>
-
-    <h1>
-        From farm waste to a
-        <span>valuable <br> resource.</span>
-    </h1>
-
-    <p>
-        One sustainable marketplace connecting agricultural
-        waste providers, organic fertilizer producers and buyers.
-        Give nature's leftovers a second life.
-    </p>
-
+    <h1>From farm waste to a <span style="color:#c5e7a7">valuable resource.</span></h1>
+    <p>One sustainable marketplace connecting agricultural waste providers, organic fertilizer producers and buyers. Give nature's leftovers a second life.</p>
     <div class="actions">
-        <a class="btn" href="waste_listings.php">
-            Explore Agro-Waste
-        </a>
-
-        <a class="btn btn-secondary" href="fertilizer_market.php">
-            Browse Fertilizer
-        </a>
+        <a class="btn" href="waste_listings.php">Explore Agro-Waste</a>
+        <a class="btn btn-secondary" href="fertilizer_market.php">Browse Fertilizer</a>
     </div>
 </section>
 
-
-<!-- Impact Numbers -->
+<!-- Impact numbers -->
 <section class="home-section impact-section">
     <h2 class="section-title">Our impact at a glance</h2>
-
     <div class="grid">
-        <div class="card stat-card">
-            <span class="pill">Community</span>
-            <h2><?= $users ?></h2></h2>
-            <p>Active registered users</p>
-        </div>
-
-        <div class="card stat-card">
-            <span class="pill">Resources</span>
-            <h2><?= $listings ?></h2>
-            <p>Waste listings available</p>
-        </div>
-
-        <div class="card stat-card">
-            <span class="pill">Circular economy</span>
-            <h2><?= number_format($exchanged, 2) ?></h2>
-            <p>Quantity exchanged (listed units)</p>
-        </div>
+        <div class="card stat-card"><span class="pill">Community</span><h2><?= $users ?></h2><p>Active registered users</p></div>
+        <div class="card stat-card"><span class="pill">Resources</span><h2><?= $listings ?></h2><p>Waste listings available</p></div>
+        <div class="card stat-card"><span class="pill">Circular economy</span><h2><?= number_format($exchanged, 2) ?></h2><p>Quantity exchanged (listed units)</p></div>
     </div>
 </section>
 
-<!-- How It Works -->
+<!-- How it works -->
 <section class="home-section process-section">
     <h2 class="section-title">How Agro Exchange works</h2>
-
     <div class="grid">
         <div class="card">
-            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=700&q=80"
-                 alt="Agricultural fields">
+            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=700&q=80" alt="Agricultural fields">
             <div class="step-number">01</div>
             <h3>Providers list waste</h3>
             <p>Farmers and businesses share organic waste materials available for collection.</p>
         </div>
-
         <div class="card">
-            <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=700&q=80"
-                 alt="Compost and soil">
+            <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=700&q=80" alt="Compost and soil" onerror="this.src='https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=700&q=80'">
             <div class="step-number">02</div>
             <h3>Producers request materials</h3>
             <p>Fertilizer makers discover suitable materials and request the quantities they need.</p>
         </div>
-
         <div class="card">
-            <img src="https://images.unsplash.com/photo-1585314062604-1a357de8b000?auto=format&fit=crop&w=700&q=80"
-                 alt="Organic plant growing">
+            <img src="https://images.unsplash.com/photo-1585314062604-1a357de8b000?auto=format&fit=crop&w=700&q=80" alt="Organic plant growing">
             <div class="step-number">03</div>
             <h3>Buy greener fertilizer</h3>
             <p>Buyers browse locally produced organic fertilizer and support sustainable agriculture.</p>
@@ -322,89 +65,37 @@ include 'includes/header.php';
     </div>
 </section>
 
-<!-- Latest Products -->
+<!-- Latest products -->
 <section class="home-section market-section">
     <h2 class="section-title">Fresh from the fertilizer market</h2>
-
     <div class="grid">
-        
-
-<?php if ($products && $products->num_rows > 0): ?>
-
-    <?php while ($p = $products->fetch_assoc()): ?>
-
-        <div class="card">
-
-            <img
-                class="feature-image"
-                src="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=700&q=80"
-                alt="Organic soil fertilizer"
-            >
-
-            <span class="pill">
-                <?= e($p['fertilizer_type']) ?>
-            </span>
-
-            <h3>
-                <?= e($p['product_name']) ?>
-            </h3>
-
-            <p class="price">
-                Rs. <?= number_format((float)$p['price'], 2) ?>
-                / <?= e($p['unit']) ?>
-            </p>
-
-            <p class="small">
-                Produced by <?= e($p['full_name']) ?>
-            </p>
-
-            <a class="btn" href="fertilizer_market.php">
-                View product market
-            </a>
-
-        </div>
-
-    <?php endwhile; ?>
-
-<?php else: ?>
-
-    <div class="card">
-        <h3>Products coming soon</h3>
-
-        <p>
-            Our marketplace is growing.
-            Check back soon for locally made organic fertilizer.
-        </p>
-
-        <a class="btn" href="fertilizer_market.php">
-            Explore market
-        </a>
-    </div>
-
-<?php endif; ?>
-
+        <?php if ($products->num_rows): while ($p = $products->fetch_assoc()): ?>
+            <div class="card">
+                <img class="feature-image" src="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=700&q=80" alt="Organic soil fertilizer">
+                <span class="pill"><?= e($p['fertilizer_type']) ?></span>
+                <h3><?= e($p['product_name']) ?></h3>
+                <p class="price">Rs. <?= number_format($p['price'], 2) ?> / <?= e($p['unit']) ?></p>
+                <p class="small">Produced by <?= e($p['full_name']) ?></p>
+                <a class="btn" href="fertilizer_market.php">View product market</a>
+            </div>
+        <?php endwhile; else: ?>
+            <div class="card">
+                <h3>Products coming soon</h3>
+                <p>Our marketplace is growing. Check back soon for locally made organic fertilizer.</p>
+                <a class="btn" href="fertilizer_market.php">Explore market</a>
+            </div>
+        <?php endif; ?>
     </div>
 </section>
 
-<!-- Composting Tips -->
+<!-- Composting tips -->
 <section class="home-section tips-section">
     <h2 class="section-title">Simple composting tips</h2>
-
     <div class="grid">
-        <div class="card">
-            <h3>Balance materials</h3>
-            <p>Mix dry leaves and crop residues with green materials like vegetable scraps.</p>
-        </div>
-
-        <div class="card">
-            <h3>Keep it moist</h3>
-            <p>Maintain moisture similar to a wrung-out sponge and avoid waterlogging.</p>
-        </div>
-
-        <div class="card">
-            <h3>Let air flow</h3>
-            <p>Turn the compost regularly to support airflow and healthy decomposition.</p>
-        </div>
+        <div class="card"><h3>Balance materials</h3><p>Mix dry leaves and crop residues with green materials like vegetable scraps.</p></div>
+        <div class="card"><h3>Keep it moist</h3><p>Maintain moisture similar to a wrung-out sponge and avoid waterlogging.</p></div>
+        <div class="card"><h3>Let air flow</h3><p>Turn the compost regularly to support airflow and healthy decomposition.</p></div>
     </div>
 </section>
+
 <?php include 'includes/footer.php'; ?>
