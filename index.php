@@ -38,9 +38,19 @@ $exchangeResult = $conn->query(
      WHERE status = 'completed'"
 );
 
+
 if ($exchangeResult) {
     $exchanged = (float)$exchangeResult->fetch_assoc()['n'];
 }
+$products = $conn->query(
+    "SELECT p.*, u.full_name
+     FROM fertilizer_products p
+     JOIN users u ON p.producer_id = u.user_id
+     WHERE p.status = 'active'
+     ORDER BY p.created_at DESC
+     LIMIT 4"
+);
+
 
 // Page title
 $pageTitle = "Home";
@@ -50,17 +60,31 @@ include 'includes/header.php';
 <style>
 /* Home Page CSS */
 
+
+
 .hero {
-    padding: 80px 8%;
-    text-align: center;
-    background:#173f2b;
-    color: white;
-    border-radius: 12px;
+   
+    margin: 28px 0% 0;
+    padding: 90px 3% 80px;
+    border-radius: 22px;
 }
 
+.home-section {
+    padding: 32px 3%;
+    margin: 22px 0% 0;
+    border-radius: 22px;
+}
+.hero h1 { font-size: 62px; line-height: 1.05; max-width: 750px; }
+.hero p { max-width: 680px; margin: 0 0 28px }
+.actions { justify-content: flex-start; }
+
+.btn { background: #1e5a36 ; border-radius: 999px; }
+.btn-secondary { background: white ; color: #173f2b  }
+
 .hero .eyebrow {
-    color:#c5e7a7;
+    color: #c5e7a7;
     font-weight: bold;
+    text-align: left;
 }
 
 .hero h1 {
@@ -88,7 +112,7 @@ include 'includes/header.php';
 .btn {
     display: inline-block;
     padding: 12px 22px;
-    background:#4d9b55;
+    background: #4d9b55;
     color: white;
     text-decoration: none;
     border-radius: 6px;
@@ -105,7 +129,7 @@ include 'includes/header.php';
 
 .section-title {
     text-align: center;
-    color:#173f2b;
+    color: #173f2b;
     margin-bottom: 30px;
 }
 
@@ -177,6 +201,42 @@ include 'includes/header.php';
         padding: 30px 5%;
     }
 }
+.section-title {
+    text-align: left;
+}
+.market-section .section-title {
+    text-align: left;
+}
+
+.market-section .grid .card:only-child {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+.btn {
+    background: #173f2b;
+}
+/* ==== PHOTO 1 wage - PARAGRAPH + BUTTONS LEFT FIX ==== */
+.hero {
+    display: block !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+}
+.hero .eyebrow, .hero h1 {
+    text-align: left !important;
+    margin-left: 0 !important;
+}
+.hero p {
+    text-align: left !important;
+    margin: 0 0 28px !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+.hero .actions {
+    display: flex !important;
+    justify-content: flex-start !important;
+    margin-left: 0 !important;
+}
 </style>
 
 <!-- Hero Section -->
@@ -185,7 +245,7 @@ include 'includes/header.php';
 
     <h1>
         From farm waste to a
-        <span>valuable resource.</span>
+        <span>valuable <br> resource.</span>
     </h1>
 
     <p>
@@ -204,6 +264,7 @@ include 'includes/header.php';
         </a>
     </div>
 </section>
+
 
 <!-- Impact Numbers -->
 <section class="home-section impact-section">
@@ -266,17 +327,7 @@ include 'includes/header.php';
     <h2 class="section-title">Fresh from the fertilizer market</h2>
 
     <div class="grid">
-        <?php
-// Get latest 4 active fertilizer products
-$products = $conn->query(
-    "SELECT p.*, u.full_name
-     FROM fertilizer_products p
-     JOIN users u ON p.producer_id = u.user_id
-     WHERE p.status = 'active'
-     ORDER BY p.created_at DESC
-     LIMIT 4"
-);
-?>
+        
 
 <?php if ($products && $products->num_rows > 0): ?>
 
@@ -356,4 +407,4 @@ $products = $conn->query(
         </div>
     </div>
 </section>
-
+<?php include 'includes/footer.php'; ?>
