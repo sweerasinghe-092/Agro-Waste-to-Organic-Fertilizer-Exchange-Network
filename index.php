@@ -1,4 +1,52 @@
+<?php
+// Database connection
+require_once 'config/db.php';
+require_once 'includes/functions.php';
 
+// Count active users
+$users = 0;
+
+$userResult = $conn->query(
+    "SELECT COUNT(*) AS n
+     FROM users
+     WHERE status = 'active'"
+);
+ 
+if ($userResult) {
+    $users = (int)$userResult->fetch_assoc()['n'];
+}
+
+// Count available waste listings
+$listings = 0;
+
+$listingResult = $conn->query(
+    "SELECT COUNT(*) AS n
+     FROM waste_listings
+     WHERE status = 'available'"
+);
+
+if ($listingResult) {
+    $listings = (int)$listingResult->fetch_assoc()['n'];
+}
+
+// Calculate exchanged quantity
+$exchanged = 0;
+
+$exchangeResult = $conn->query(
+    "SELECT COALESCE(SUM(quantity_requested), 0) AS n
+     FROM exchange_requests
+     WHERE status = 'completed'"
+);
+
+if ($exchangeResult) {
+    $exchanged = (float)$exchangeResult->fetch_assoc()['n'];
+}
+
+// Page title
+$pageTitle = "Home";
+
+include 'includes/header.php';
+?>
 <style>
 /* Home Page CSS */
 
@@ -164,19 +212,19 @@
     <div class="grid">
         <div class="card stat-card">
             <span class="pill">Community</span>
-            <h2>ACTIVE_USERS</h2>
+            <h2><?= $users ?></h2></h2>
             <p>Active registered users</p>
         </div>
 
         <div class="card stat-card">
             <span class="pill">Resources</span>
-            <h2>AVAILABLE_LISTINGS</h2>
+            <h2><?= $listings ?></h2>
             <p>Waste listings available</p>
         </div>
 
         <div class="card stat-card">
             <span class="pill">Circular economy</span>
-            <h2>EXCHANGED_QUANTITY</h2>
+            <h2><?= number_format($exchanged, 2) ?></h2>
             <p>Quantity exchanged (listed units)</p>
         </div>
     </div>
