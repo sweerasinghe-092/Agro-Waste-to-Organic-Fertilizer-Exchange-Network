@@ -1,4 +1,22 @@
-<?php
+if($_SERVER['REQUEST_METHOD']==='POST'){
+    if(isset($_POST['user_action'])){
+        $id=(int)$_POST['user_id']; $action=$_POST['user_action'];
+        if($id!==$uid && in_array($action,['active','suspended'],true)){
+            $st=$conn->prepare("UPDATE users SET status=? WHERE user_id=? AND role<>'admin'");
+            $st->bind_param('si',$action,$id); $st->execute();
+            if($st->affected_rows>0){
+                $msg=$action==='active'?'Your Agro Exchange account has been approved. You can now log in.':'Your Agro Exchange account has been suspended. Please contact the administrator.';
+                notify_user($conn,$id,'account_status',$msg,'login.php');
+            }
+            $notice='User account status updated.';
+        }
+    }
+    if(isset($_POST['remove_listing'])){
+        $id=(int)$_POST['listing_id'];
+        $st=$conn->prepare("UPDATE waste_listings SET status='removed' WHERE listing_id=?");
+        $st->bind_param('i',$id); $st->execute(); $notice='Listing removed from public results.';
+    }
+}<?php
 require_once 'config/db.php';
 require_once 'includes/functions.php';
 require_role('admin');
