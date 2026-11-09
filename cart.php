@@ -11,6 +11,9 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
+$msg = "";
+$err = "";
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     $pid = (int)$_POST['product_id'];
     $qty = (int)$_POST['qty'];
@@ -20,6 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     } else {
         $_SESSION['cart'][$pid] = $qty;
     }
+    $msg = "Added to cart.";
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove'])) {
+    $pid = (int)$_POST['product_id'];
+    unset($_SESSION['cart'][$pid]);
+    $msg = "Removed from cart.";
 }
 
 $items = [];
@@ -46,6 +56,8 @@ if (!empty($_SESSION['cart'])) {
 <body>
 <div class="dashboard">
     <h1>My Cart</h1>
+    <?php if ($msg): ?><p class="message"><?= e($msg) ?></p><?php endif; ?>
+    <?php if ($err): ?><p class="error"><?= e($err) ?></p><?php endif; ?>
     <table>
         <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Action</th></tr>
         <?php if (empty($items)): ?>
@@ -57,7 +69,12 @@ if (!empty($_SESSION['cart'])) {
                 <td>Rs. <?= $it['price'] ?></td>
                 <td><?= $it['qty'] ?></td>
                 <td>Rs. <?= $it['subtotal'] ?></td>
-                <td>Remove</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="product_id" value="<?= $it['product_id'] ?>">
+                        <button name="remove">Remove</button>
+                    </form>
+                </td>
             </tr>
             <?php endforeach; ?>
         <?php endif; ?>
