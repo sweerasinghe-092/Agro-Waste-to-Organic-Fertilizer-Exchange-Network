@@ -32,6 +32,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove'])) {
     $msg = "Removed from cart.";
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkout'])) {
+    if (empty($_SESSION['cart'])) {
+        $err = "Cart is empty.";
+    } else {
+        $conn->begin_transaction();
+        try {
+            $total = 0;
+            foreach ($_SESSION['cart'] as $pid => $qty) {
+                $st = $conn->prepare("SELECT * FROM products WHERE product_id = ? FOR UPDATE");
+                $st->bind_param("i", $pid);
+                $st->execute();
+                $p = $st->get_result()->fetch_assoc();
+                if (!$p || $p['stock'] < $qty) {
+                    throw new Exception("Not enough stock for " . $p['product_name']);
+                }
+                $total += $p['price'] * $qty;
+            }
+
+            $uid = (int)$_SESSION['user_id'];
+            $st = $conn->prepare("INSERT INTO orders (buyer_id, total_amount, status) VALUES (?, ?, 'pending')");
+            $st->bind_param("id", $uid, $total);
+            $st->execute();
+            $order_id = $conn->insert_id;
+
+            foreach ($_SESSION['cart'] as $pid => $qty) {
+                $st = $conn->prepare("SELECT price FROM products WHERE product_id = ?");
+                $st->bind_param("i", $pid);
+                $st->execute();
+                $price = $st->get_result()->fetch_assoc()['price'];
+
+                $st = $conn->prepare("INSERT INTO order_items (order_id, product_id, qty, price) VALUES (?, ?, ?, ?)");
+                $st->bind_param("iiid", $order_id, $pid, $qty, $price);
+                $st->execute();
+
+                $st = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
+                $st->bind_param("ii", $qty, $pid);
+                $st->execute();
+            }
+
+            $conn->commit();
+            $_SESSION['cart'] = [];
+            $msg = "Order placed successfully.";
+        } catch (Exception $e) {
+            $conn->rollback();
+            $err = $e->getMessage();
+        }
+    }
+}
+
 $items = [];
 $total = 0;
 if (!empty($_SESSION['cart'])) {
