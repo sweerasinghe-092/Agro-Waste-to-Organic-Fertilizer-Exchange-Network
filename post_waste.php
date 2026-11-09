@@ -36,6 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check inputs
     if ($title === '' || $category < 1 || $district < 1 || $qty <= 0 || $price < 0 || !in_array($unit, ['kg', 'tons', 'bags'], true)) {
         $error = "Please enter valid listing details.";
+    } else if ($from && $until && $until < $from) {
+        // Added Validate available dates
+        $error = "Available until date cannot be before available from date.";
     } else {
         $image = $existing['image'] ?? '';
 
