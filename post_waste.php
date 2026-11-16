@@ -64,14 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $st = $conn->prepare("UPDATE waste_listings SET category_id = ?, district_id = ?, title = ?, description = ?, quantity_available = ?, unit = ?, price_per_unit = ?, available_from = NULLIF(?, ''), available_until = NULLIF(?, ''), pickup_location = ?, image = ? WHERE listing_id = ? AND provider_id = ?");
                 $st->bind_param("iissdsdssssii", $category, $district, $title, $desc, $qty, $unit, $price, $from, $until, $location, $image, $id, $userId);
                 $st->execute();
+                $savedId = $id;
             }
             // Add new listing
             else {
                 $st = $conn->prepare("INSERT INTO waste_listings (provider_id, category_id, district_id, title, description, quantity_available, unit, price_per_unit, available_from, available_until, pickup_location, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULLIF(?, ''), NULLIF(?, ''), ?, ?)");
                 $st->bind_param("iiissdsdssss", $userId, $category, $district, $title, $desc, $qty, $unit, $price, $from, $until, $location, $image);
                 $st->execute();
+                $savedId = (int)$conn->insert_id;
             }
-            header("Location: dashboard.php?posted=1");
+            // NEW - after save, go directly to that listing details page
+            header("Location: waste_details.php?id=" . $savedId);
             exit;
         }
     }
@@ -117,7 +120,12 @@ include 'includes/header.php';
         <input type="number" name="quantity_available" min="0.01" step="0.01" required value="<?= e($existing['quantity_available'] ?? '') ?>">
 
         <label>Unit</label>
-        <select name="unit"><option>kg</option><option>tons</option><option>bags</option></select>
+        <!-- NEW - keep old unit selected when editing -->
+        <select name="unit">
+            <?php foreach (['kg', 'tons', 'bags'] as $u): ?>
+                <option value="<?= $u ?>" <?= ($existing['unit'] ?? 'kg') === $u ? 'selected' : '' ?>><?= e($u) ?></option>
+            <?php endforeach; ?>
+        </select>
 
         <label>Price per unit (0 = free)</label>
         <input type="number" name="price_per_unit" min="0" step="0.01" value="<?= e($existing['price_per_unit'] ?? 0) ?>">
@@ -140,9 +148,18 @@ include 'includes/header.php';
         <input type="date" name="available_until" value="<?= e($existing['available_until'] ?? '') ?>">
 
         <label>Photo (JPG/PNG/WEBP, max 2MB)</label>
+        <!-- NEW - show current photo when editing -->
+        <?php if (!empty($existing['image'])): ?>
+            <p><img src="<?= e($existing['image']) ?>" alt="Current photo" style="max-width:200px; border-radius:8px; margin:6px 0;"></p>
+            <small>Leave empty to keep this photo.</small>
+        <?php endif; ?>
         <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp">
 
-        <button>Save Listing</button>
+        <!-- NEW - Save and Cancel same design, side by side -->
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button>Save Listing</button>
+            <button type="button" onclick="window.location.href='dashboard.php'">Cancel</button>
+        </div>
     </form>
 </div>
 
