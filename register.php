@@ -18,6 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check required fields
     if (!$full_name || !$email || !$phone || !$password || !$role || !$district_id) {
         $err = "Please fill all required fields.";
+    } elseif (!preg_match('/^0[0-9]{9}$/', $phone)) {
+        $err = "Enter a valid phone number.";
     } else {
         // Check if email already exists
         $st = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
@@ -81,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div>
                     <label>Phone</label>
-                    <input name="phone" required>
+                    <input type="tel" name="phone" pattern="[0-9]{10}" maxlength="10" placeholder="0712345678" required>
                 </div>
             </div>
 
