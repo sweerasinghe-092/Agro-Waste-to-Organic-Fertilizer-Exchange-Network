@@ -4,7 +4,6 @@ require_once 'includes/functions.php';
 require_role('buyer');
 
 if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
-
 // Add to cart - from fertilizer_market.php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $pid = (int)$_POST['add_product'];
