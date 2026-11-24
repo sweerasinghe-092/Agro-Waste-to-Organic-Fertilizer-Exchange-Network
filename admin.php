@@ -8,7 +8,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 $msg=$action==='active'?'Your Agro Exchange account has been approved. You can now log in.':'Your Agro Exchange account has been suspended. Please contact the administrator.';
                 notify_user($conn,$id,'account_status',$msg,'login.php');
             }
-            $notice='User account status updated.';
+            	$notice='User account status updated.';
         }
     }
     if(isset($_POST['remove_listing'])){
